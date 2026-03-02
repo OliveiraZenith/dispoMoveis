@@ -8,13 +8,55 @@ import Login from "./pages/login";
 const Stack = createStackNavigator();
 
 export default function Routes() {
-    return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen name="login" component={Login}/>
-                {/* <Stack.Screen name="main" component={Main}/>
-                <Stack.Screen name="user" component={User}/> */}
-            </Stack.Navigator>
-        </NavigationContainer>
-    )
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="login"
+          component={Login}
+          options={{
+            title: "LOGIN",
+            headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#7159c1",
+            },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              color: "#fff",
+            },
+          }}
+        />
+        {/* <Stack.Screen
+          name="main"
+          component={Main}
+          options={{
+            title: "GitHub Viewer",
+            headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#7159c1",
+            },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              color: "#fff",
+            },
+          }}
+        />
+        <Stack.Screen
+          name="user"
+          component={User}
+          options={{
+            title: "Perfil do Usuário",
+            headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#7159c1",
+            },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              color: "#fff",
+            },
+          }}
+        /> */}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
