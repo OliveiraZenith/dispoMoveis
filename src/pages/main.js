@@ -53,8 +53,15 @@ export default class Main extends Component {
             
             Keyboard.dismiss();
         }catch (error){
+            alert("Usuário não encontrado!");
+            this.setState({loading: false});
 
         }
     }
+    render() {
+        const {users, newUser, loading} = this.state;
+        return(
 
+        )
+    }
 }
