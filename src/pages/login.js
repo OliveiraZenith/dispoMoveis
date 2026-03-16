@@ -15,12 +15,13 @@ const Login = () => {
   const navigation = useNavigation();
 
   const handleLogin = () => {
-    if (email === "xandy@gmail.com" && password === "123") {
+    if (email === "" && password === "") {
       navigation.navigate("main");
     } else {
-      Alert.alert("E-mail ou senha invalidos!");
+      Alert.alert("E-mail ou senha inválidos!");
     }
   };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -37,7 +38,7 @@ const Login = () => {
         onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+        <Text style={styles.buttonText}>ENTRAR</Text>
       </TouchableOpacity>
     </View>
   );
@@ -48,18 +49,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#CCC",
     borderRadius: 5,
     padding: 10,
     marginVertical: 10,
     width: "80%",
   },
   button: {
-    backgroundColor: "#7159c1",
+    backgroundColor: "#9705f9c2",
     borderRadius: 5,
     padding: 10,
     width: "80%",
