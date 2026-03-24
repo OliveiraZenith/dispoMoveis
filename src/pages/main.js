@@ -40,8 +40,15 @@ export default class Main extends Component {
   handleAddUser = async () => {
     try {
       const { users, newUser } = this.state;
+      const userToSearch = newUser.trim();
+
+      if (!userToSearch) {
+        alert("Digite o login do GitHub para adicionar.");
+        return;
+      }
+
       this.setState({ loading: true });
-      const response = await api.get(`/users/${newUser}`);
+      const response = await api.get(`/users/${userToSearch}`);
       if (users.find((user) => user.login === response.data.login)) {
         alert("Usuário já adicionado!");
         this.setState({ loading: false });
@@ -62,7 +69,11 @@ export default class Main extends Component {
       });
       Keyboard.dismiss();
     } catch (error) {
-      alert("Usuário não encontrado!");
+      if (error?.response?.status === 404) {
+        alert("Usuário não encontrado no GitHub.");
+      } else {
+        alert("Falha ao buscar usuário. Verifique sua conexão.");
+      }
       this.setState({ loading: false });
     }
   };
@@ -99,19 +110,22 @@ export default class Main extends Component {
               <Avatar source={{ uri: item.avatar }} />
               <Name>{item.name}</Name>
               <Bio>{item.bio}</Bio>
-              <ProfileButton onPress={() => {
-                this.props.navigation.navigate("user", { user: item});
-              }}
+              <ProfileButton
+                onPress={() => {
+                  this.props.navigation.navigate("User", { user: item });
+                }}
               >
                 <ProfileButtonText>Ver Perfil</ProfileButtonText>
               </ProfileButton>
               <ProfileButton
                 onPress={() => {
-                    this.setState({ 
-                        users: this.state.users.filter((user) => user.login !== item.login)
-                    });
+                  this.setState({
+                    users: this.state.users.filter(
+                      (user) => user.login !== item.login,
+                    ),
+                  });
                 }}
-                style={{ backgroundColor: "#ea6ee8" }}
+                style={{ backgroundColor: "#fd92a4ff" }}
               >
                 <ProfileButtonText>Excluir</ProfileButtonText>
               </ProfileButton>
