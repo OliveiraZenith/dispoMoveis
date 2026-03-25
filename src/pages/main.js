@@ -5,6 +5,7 @@ import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Container,
+  Content,
   Form,
   Input,
   SubmitButton,
@@ -13,125 +14,137 @@ import {
   Avatar,
   Name,
   Bio,
+  Badge,
+  BadgeText,
   ProfileButton,
   ProfileButtonText,
 } from "../styles";
 export default class Main extends Component {
   state = {
-    newUser: "",
-    users: [],
+    newPokemon: "",
+    pokemons: [],
     loading: false,
   };
 
   async componentDidMount() {
-    const users = await AsyncStorage.getItem("users");
-    if (users) {
-      this.setState({ users: JSON.parse(users) });
+    const pokemons = await AsyncStorage.getItem("pokemons");
+    if (pokemons) {
+      this.setState({ pokemons: JSON.parse(pokemons) });
     }
   }
 
   componentDidUpdate(_, prevState) {
-    const { users } = this.state;
-    if (prevState.users !== users) {
-      AsyncStorage.setItem("users", JSON.stringify(users));
+    const { pokemons } = this.state;
+    if (prevState.pokemons !== pokemons) {
+      AsyncStorage.setItem("pokemons", JSON.stringify(pokemons));
     }
   }
 
-  handleAddUser = async () => {
+  handleAddPokemon = async () => {
     try {
-      const { users, newUser } = this.state;
-      const userToSearch = newUser.trim();
+      const { pokemons, newPokemon } = this.state;
+      const pokemonToSearch = newPokemon.trim().toLowerCase();
 
-      if (!userToSearch) {
-        alert("Digite o login do GitHub para adicionar.");
+      if (!pokemonToSearch) {
+        alert("Digite o nome ou ID do pokémon para adicionar.");
         return;
       }
 
       this.setState({ loading: true });
-      const response = await api.get(`/users/${userToSearch}`);
-      if (users.find((user) => user.login === response.data.login)) {
-        alert("Usuário já adicionado!");
+      const response = await api.get(`/pokemon/${pokemonToSearch}`);
+
+      if (pokemons.find((pokemon) => pokemon.id === response.data.id)) {
+        alert("Pokémon já adicionado!");
         this.setState({ loading: false });
         return;
       }
+
       const data = {
+        id: response.data.id,
         name: response.data.name,
-        login: response.data.login,
-        bio: response.data.bio,
-        avatar: response.data.avatar_url,
+        image: response.data.sprites.front_default,
+        mainType: response.data.types?.[0]?.type?.name || "desconhecido",
+        height: response.data.height,
+        weight: response.data.weight,
       };
-      console.log(data);
 
       this.setState({
-        users: [...users, data],
-        newUser: "",
+        pokemons: [...pokemons, data],
+        newPokemon: "",
         loading: false,
       });
       Keyboard.dismiss();
     } catch (error) {
       if (error?.response?.status === 404) {
-        alert("Usuário não encontrado no GitHub.");
+        alert("Pokémon não encontrado.");
       } else {
-        alert("Falha ao buscar usuário. Verifique sua conexão.");
+        alert("Falha ao buscar pokémon. Verifique sua conexão.");
       }
       this.setState({ loading: false });
     }
   };
 
   render() {
-    const { users, newUser, loading } = this.state;
+    const { pokemons, newPokemon, loading } = this.state;
     return (
       <Container>
-        <Form>
-          <Input
-            autoCorrect={false}
-            autoCapitalize="none"
-            placeholder="Adicionar usuário"
-            value={newUser}
-            onChangeText={(text) => this.setState({ newUser: text })}
-            returnKeyType="send"
-            onSubmitEditing={this.handleAddUser}
-          />
-          <SubmitButton loading={loading} onPress={this.handleAddUser}>
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Icon name="add" size={20} color="#fff" />
-            )}
-          </SubmitButton>
-        </Form>
+        <Content>
+          <Form>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              placeholder="Pesquisar pokémon por nome ou ID"
+              value={newPokemon}
+              onChangeText={(text) => this.setState({ newPokemon: text })}
+              returnKeyType="send"
+              onSubmitEditing={this.handleAddPokemon}
+            />
+            <SubmitButton loading={loading} onPress={this.handleAddPokemon}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Icon name="add" size={20} color="#fff" />
+              )}
+            </SubmitButton>
+          </Form>
 
-        <List
-          showsVerticalScrollIndicator={false}
-          data={users}
-          keyExtractor={(user) => user.login}
-          renderItem={({ item }) => (
-            <User>
-              <Avatar source={{ uri: item.avatar }} />
-              <Name>{item.name}</Name>
-              <Bio>{item.bio}</Bio>
-              <ProfileButton
-                onPress={() => {
-                  this.props.navigation.navigate("User", { user: item });
-                }}
-              >
-                <ProfileButtonText>Ver Perfil</ProfileButtonText>
-              </ProfileButton>
-              <ProfileButton
-                onPress={() => {
-                  this.setState({
-                    users: this.state.users.filter(
-                      (user) => user.login !== item.login,
-                    ),
-                  });
-                }}
-                style={{ backgroundColor: "#fd92a4ff" }}
-              >
-                <ProfileButtonText>Excluir</ProfileButtonText>
-              </ProfileButton>
-            </User>
-          )}
-        />
+          <List
+            data={pokemons}
+            keyboardShouldPersistTaps="handled"
+            keyExtractor={(pokemon) => String(pokemon.id)}
+            renderItem={({ item }) => (
+              <User>
+                <Avatar source={{ uri: item.image }} />
+                <Name>{item.name}</Name>
+                <Bio>Pokédex #{item.id}</Bio>
+                <Badge style={{ alignSelf: "center" }}>
+                  <BadgeText>{item.mainType}</BadgeText>
+                </Badge>
+                <Bio>Altura: {item.height}</Bio>
+                <Bio>Peso: {item.weight}</Bio>
+                <ProfileButton
+                  onPress={() =>
+                    this.props.navigation.navigate("Pokemon", { pokemon: item })
+                  }
+                >
+                  <ProfileButtonText>Ver Mais Detalhes</ProfileButtonText>
+                </ProfileButton>
+                <ProfileButton
+                  variant="danger"
+                  onPress={() => {
+                    this.setState({
+                      pokemons: this.state.pokemons.filter(
+                        (pokemon) => pokemon.id !== item.id,
+                      ),
+                    });
+                  }}
+                >
+                  <ProfileButtonText>Excluir</ProfileButtonText>
+                </ProfileButton>
+              </User>
+            )}
+          />
+        </Content>
       </Container>
     );
   }

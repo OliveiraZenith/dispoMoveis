@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  AuthContainer,
+  AuthCard,
+  AuthTitle,
+  FieldInput,
+  Button,
+  ButtonText,
+} from "../styles";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,76 +18,67 @@ const Login = () => {
   const navigation = useNavigation();
 
   const handleLogin = async () => {
-    const user = await AsyncStorage.getItem("user")
-    if(!user){
-      alert("Nenhum usuário cadastrado!")
-      return
+    const user = await AsyncStorage.getItem("user");
+    if (!user) {
+      alert("Nenhum usuário cadastrado!");
+      return;
     }
-    const userJson = JSON.parse(user)
-    if(userJson.email === email && userJson.password === password){
-      navigation.navigate("Main")
-    }else{
-      alert("E-mail ou senha inválidos!")
+    const userJson = JSON.parse(user);
+    if (userJson.email === email && userJson.password === password) {
+      navigation.navigate("Main");
+    } else {
+      alert("E-mail ou senha inválidos!");
     }
   };
 
   const handleCadastro = () => {
-    navigation.navigate("Cadastro")
-  }
+    navigation.navigate("Cadastro");
+  };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={password}
-        secureTextEntry={true}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
+    <AuthContainer>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <AuthCard>
+          <AuthTitle>Bem-vindo à Pokédex</AuthTitle>
+          <FieldInput
+            placeholder="E-mail"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <FieldInput
+            placeholder="Senha"
+            value={password}
+            secureTextEntry={true}
+            onChangeText={setPassword}
+          />
 
-      <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
-    </View>
+          <Button onPress={handleLogin}>
+            <ButtonText>Entrar</ButtonText>
+          </Button>
+
+          <Button onPress={handleCadastro}>
+            <ButtonText>Cadastrar</ButtonText>
+          </Button>
+        </AuthCard>
+      </ScrollView>
+    </AuthContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
+  scroll: {
+    width: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
-    backgroundColor: "#FFF",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 5,
-    padding: 10,
-    marginVertical: 10,
-    width: "80%",
-  },
-  button: {
-    backgroundColor: "#9705f9c2",
-    borderRadius: 5,
-    padding: 10,
-    width: "80%",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textTransform: "uppercase",
   },
 });
 
