@@ -1,4 +1,4 @@
-# Ana Laura Lis Oliveira Zenith e Carlos Costa
+# Ana Laura Lis Oliveira Zenith e Carlos Adriano T S Costa
 
 ## Pokédex
 
